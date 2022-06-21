@@ -13,5 +13,5 @@ func addPlayer(playerName, readyState):
 func newReadyState(playerName, newState):
 	playerDict[playerName]['state'] = newState
 
-func processServerMessage(msg):
+func updateLobbyState(dictData):
 	pass

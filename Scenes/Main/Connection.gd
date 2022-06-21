@@ -27,4 +27,19 @@ func _on_CloseOption_pressed():
 # Start connection to server ###################################################
 func _on_ConnecButton_pressed():
 	var pseudo = $ConnectionPannel/Layout/PseudoCont/PseudoEdit.text
-	pass # Connect to server
+	Network.connectToServer($OptionPanel/VBoxContainer/IP/LineEdit.text)
+	enableLobby()
+
+func _on_HostButton_pressed():
+	Network.hostServer()
+	enableLobby()
+	
+func enableLobby():
+	$ConnectionPannel.visible = false
+	$ServerContainer.visible = true
+	var _pseudo = $ConnectionPannel/Layout/PseudoCont/PseudoEdit.text
+	# Clean the pseudo to ease the process of message
+	_pseudo = _pseudo.replace('|', '_')
+	_pseudo = _pseudo.replace(':', '_')
+	GameData.pseudo = _pseudo
+	GameData.addPlayer(_pseudo, false)
