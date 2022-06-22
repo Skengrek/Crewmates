@@ -42,4 +42,4 @@ func enableLobby():
 	_pseudo = _pseudo.replace('|', '_')
 	_pseudo = _pseudo.replace(':', '_')
 	GameData.pseudo = _pseudo
-	GameData.addPlayer(_pseudo, false)
+	GameData.addPlayer(1, _pseudo, false)

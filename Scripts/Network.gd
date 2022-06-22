@@ -48,6 +48,7 @@ func onPeerConnected(playerId):
 	
 func onPeerDisconnected(playerId):
 	print(playerId, ' is disconnected')
+	GameData.playerDict.erase(playerId)
 
 
 # Dialog with the server #######################################################
@@ -60,23 +61,25 @@ func sendMessageToServer(msg):
 remote func processMessage(msg):
 	var split = msg.rsplit('|')
 	var dataDict = {}
+	var id = get_tree().get_rpc_sender_id()
 	print(split)
 	var command = split[0]
 	if command == 'Connect':
-		GameData.addPlayer(split[-1], false)
+		GameData.addPlayer(id, split[-1], false)
 	if command == 'UpdateLobby':
 		split.remove(0)
 		for data in split:
 			var splitedData = data.rsplit(':')
 			if not splitedData[0] in GameData.playerDict:
-				GameData.addPlayer(splitedData[0], splitedData[1])
+				GameData.addPlayer(splitedData[0], splitedData[1], splitedData[2])
 			else:
-				GameData.newReadyState(splitedData[0], splitedData[1])
+				GameData.newReadyState(splitedData[0], splitedData[2])
 
 func generateUpdateLobbyString():
 	var strRen = 'UpdateLobby'
 	for key in GameData.playerDict:
 		var value = GameData.playerDict[key]['state']
-		strRen += '|' + str(key) + ':' + str(value)
+		var pseudo = GameData.playerDict[key]['pseudo']
+		strRen += '|'+ str(key) + ':' + str(pseudo) + ':' + str(value)
 	print(strRen)
 	return strRen
