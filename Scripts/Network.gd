@@ -13,6 +13,7 @@ func _process(delta):
 		time += delta
 		if time >= 0.5:
 			rpc_id(0, 'processMessage', generateUpdateLobbyString())
+			rpc_id(0, 'processMessage', generateChatUpdate())
 
 # Connect to another server ####################################################
 func connectToServer(newIp):
@@ -54,7 +55,7 @@ func onPeerDisconnected(playerId):
 # Dialog with the server #######################################################
 func sendMessageToServer(msg):
 	if isServer:
-		server.receivedMessage(null, msg)
+		processMessage(msg)
 	else:
 		rpc_id(1, 'processMessage', msg)
 		
@@ -62,7 +63,6 @@ remote func processMessage(msg):
 	var split = msg.rsplit('|')
 	var dataDict = {}
 	var id = get_tree().get_rpc_sender_id()
-	print(split)
 	var command = split[0]
 	if command == 'Connect':
 		GameData.addPlayer(id, split[-1], false)
@@ -74,6 +74,14 @@ remote func processMessage(msg):
 				GameData.addPlayer(splitedData[0], splitedData[1], splitedData[2])
 			else:
 				GameData.newReadyState(splitedData[0], splitedData[2])
+				
+	if command == 'Message':
+		split.remove(0)
+		GameData.addChatMessage(split[0], split[1])
+		
+	if command == 'UpdateChat':
+		split.remove(0)
+		GameData.addNewMessage(split[0])
 
 func generateUpdateLobbyString():
 	var strRen = 'UpdateLobby'
@@ -81,5 +89,8 @@ func generateUpdateLobbyString():
 		var value = GameData.playerDict[key]['state']
 		var pseudo = GameData.playerDict[key]['pseudo']
 		strRen += '|'+ str(key) + ':' + str(pseudo) + ':' + str(value)
-	print(strRen)
 	return strRen
+
+func generateChatUpdate():
+	var strRen = 'UpdateChat'
+	return strRen + '|' + GameData.processChat()
